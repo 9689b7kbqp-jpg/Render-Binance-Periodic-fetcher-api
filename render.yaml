@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: binance-decision-api
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SYMBOL
+        value: BTCUSDC
+      - key: CAPITAL
+        value: "1420"
+      - key: SIGNAL_HOURS
+        value: "2"
+      - key: KLINE_LIMIT
+        value: "100"
+      - key: REFRESH_SECONDS
+        value: "15"
+      - key: STALE_SECONDS
+        value: "30"
+      - key: BINANCE_BASE_URL
+        value: https://api.binance.com
