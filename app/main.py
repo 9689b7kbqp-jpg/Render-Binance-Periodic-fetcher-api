@@ -12,6 +12,7 @@ from app.models import DecisionResult
 from app.state import cache, cache_lock
 from app.strategy import compute_decision, compute_strategy_inputs
 
+from app.logger import append_jsonl
 
 def env_str(name: str, default: str) -> str:
     return os.getenv(name, default)
@@ -53,9 +54,16 @@ async def refresh_loop() -> None:
                 signal_hours=DEFAULT_SIGNAL_HOURS,
                 kline_limit=DEFAULT_KLINE_LIMIT,
             )
+
+            try:
+                append_jsonl(result)
+            except Exception as log_exc:
+                result.warnings.append(f"log write failed: {log_exc}")
+
             async with cache_lock:
                 cache.latest = result
                 cache.last_error = None
+
         except Exception as exc:
             fallback = DecisionResult(
                 symbol=DEFAULT_SYMBOL,
@@ -65,9 +73,16 @@ async def refresh_loop() -> None:
                 reasons=["background refresh failed"],
                 error=str(exc),
             )
+
+            try:
+                append_jsonl(fallback)
+            except Exception:
+                pass
+
             async with cache_lock:
                 cache.latest = fallback
                 cache.last_error = str(exc)
+
         await asyncio.sleep(REFRESH_SECONDS)
 
 
