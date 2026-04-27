@@ -17,8 +17,10 @@ services:
       - key: KLINE_LIMIT
         value: "100"
       - key: REFRESH_SECONDS
-        value: "15"
+        value: "120"
       - key: STALE_SECONDS
-        value: "30"
+        value: "300"
       - key: BINANCE_BASE_URL
         value: https://api.binance.com
+      - key: LOG_PATH
+        value: /tmp/trading_log.jsonl
